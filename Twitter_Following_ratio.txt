@@ -1,0 +1,96 @@
+# Chad Efaw
+# September 2016
+# Analyzing who I follow on twitter to get a better sense of the voices I hear
+# mhawksey's 'Export Twitter friends and followers' Google sheet
+# Professor Jenny Brian's 'googlesheets' package to read exported data
+# gender package to find the ratio of male and female accounts I follow
+# strsplit package to clean string data and coerce in data frame
+
+# Install appropriate packages
+
+install.packages("googlesheets")
+library(googlesheets)
+install.packages("dplyr")
+library(dplyr)
+install.packages("gender")
+library(gender)
+install.packages("strsplit")
+library(strsplit)
+
+# Before using this R code go to:
+# https://mashe.hawksey.info/2011/03/export-twitter-followers/
+# to download and export people you follow on twitter
+# Follow directions, request google API and such
+# Create an object that reads the specific google sheet w/ twitter data
+
+twitter_url <- gs_url("Enter the URL of the google sheet you want to analyze")
+
+# Create an object that contains the specific name of the sheet
+# When you run the prior code, it will give you the exact name
+
+twitter <- gs_title("Twitter Following")
+
+# Open the specific sheet with your friends 
+
+twitter %>% gs_browse(ws = "Friends") 
+
+# create an object that contains the page you want to analyze
+
+twitter_friends <- gs_read(twitter)
+
+# Create a new object to split names of friends by 'space' 
+
+df_names <- 
+strsplit(twitter_friends$name," ")
+
+# create a matrix to list prior data and coerce into data frame
+
+mat  <- matrix(unlist(df_names), ncol=2, byrow=TRUE)
+df   <- as.data.frame(mat)
+
+# Rename df columns from v1 and V2 to First and Last
+
+df<-
+rename(df, c("First"="name", "V2"="Last"))
+
+# create a new object to calculate P(M|F)
+
+df_gender<-
+  gender(df$First, years = c(1932,2012))
+
+# Use left_join to join df_gender$gender and df_first by name
+# create new object to hold new data
+
+df_name_gender <-
+  df %>% left_join(df_gender, by="name")
+
+# Use dplyr to remove duplicate rows
+
+names_distinct<-
+dplyr::distinct(df_name_gender)
+
+# Filter  
+
+Male<-
+dplyr::filter(names_distinct, gender == "male")
+
+Female<-
+  dplyr::filter(names_distinct, gender == "female")
+
+# Find how many male accounts you follow
+
+Male_num<-
+  nrow(Male)
+# Ditto for female accounts
+
+Female_num<-
+  nrow(Female)
+
+# Calculate the ratio 
+
+ratio <- Female_num/Male_num
+
+# print result 
+
+ratio
+
