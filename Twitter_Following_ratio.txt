@@ -2,7 +2,7 @@
 # September 2016
 # Analyzing who I follow on twitter to get a better sense of the voices I hear
 # mhawksey's 'Export Twitter friends and followers' Google sheet
-# Professor Jenny Brian's 'googlesheets' package to read exported data
+# Professor Jenny Bryan's 'googlesheets' package to read exported data
 # gender package to find the ratio of male and female accounts I follow
 # strsplit package to clean string data and coerce in data frame
 
